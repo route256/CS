@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+option csharp_namespace = "WeatherSimulator.Proto";
+package WeatherSimulator.Proto;
+
+service WeatherSimulatorService {
+  rpc GetSensorsStream (stream ToServerMessage) returns (stream SensorData);
+}
+
+message ToServerMessage{
+  repeated string subscribe_sensors_ids = 1;
+  repeated string unsubscribe_sensors_ids = 2;
+}
+
+message SensorData {
+  string sensor_id = 1;
+  double temperature = 2;
+  int32 humidity = 3;
+  int32 co2 = 4;
+  SensorLocationType LocationType = 5;
+}
+
+message SensorInfo{
+  string sensor_id = 1;
+  SensorLocationType LocationType = 2;
+}
+
+enum SensorLocationType{
+    Internal = 0;
+    External = 1;
+}

@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{0D67E7F5-5755-446E-991B-EBF6BCF3A659}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
+		readme.md = readme.md
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ozon.Route256.Postgres.Api", "src\Ozon.Route256.Postgres.Api\Ozon.Route256.Postgres.Api.csproj", "{0C09A817-44DC-451C-8D7D-2AD2DDB6D937}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F769AE4F-2AA0-4204-99B0-DEAF18BFCFCC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ozon.Route256.Postgres.Persistence", "src\Ozon.Route256.Postgres.Persistence\Ozon.Route256.Postgres.Persistence.csproj", "{F2E98D7E-F02B-41E6-ABC3-F34037E2D67E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ozon.Route256.Postgres.Domain", "src\Ozon.Route256.Postgres.Domain\Ozon.Route256.Postgres.Domain.csproj", "{7DE31532-823D-41B6-B9BF-C32858DFA962}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{2B185019-54A5-4DB0-88AB-11EC9ED77E9F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ozon.Route256.Postgres.IntegrationTests", "tests\Ozon.Route256.Postgres.IntegrationTests\Ozon.Route256.Postgres.IntegrationTests.csproj", "{573EB1F5-34F6-4FDE-A2AA-EDCB87CD414F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ozon.Route256.Postgres.Kafka", "src\Ozon.Route256.Postgres.Kafka\Ozon.Route256.Postgres.Kafka.csproj", "{9C7A7455-D0D4-4B90-B445-D18919B682DA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0C09A817-44DC-451C-8D7D-2AD2DDB6D937}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C09A817-44DC-451C-8D7D-2AD2DDB6D937}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C09A817-44DC-451C-8D7D-2AD2DDB6D937}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C09A817-44DC-451C-8D7D-2AD2DDB6D937}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2E98D7E-F02B-41E6-ABC3-F34037E2D67E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2E98D7E-F02B-41E6-ABC3-F34037E2D67E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2E98D7E-F02B-41E6-ABC3-F34037E2D67E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2E98D7E-F02B-41E6-ABC3-F34037E2D67E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DE31532-823D-41B6-B9BF-C32858DFA962}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DE31532-823D-41B6-B9BF-C32858DFA962}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DE31532-823D-41B6-B9BF-C32858DFA962}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DE31532-823D-41B6-B9BF-C32858DFA962}.Release|Any CPU.Build.0 = Release|Any CPU
+		{573EB1F5-34F6-4FDE-A2AA-EDCB87CD414F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{573EB1F5-34F6-4FDE-A2AA-EDCB87CD414F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{573EB1F5-34F6-4FDE-A2AA-EDCB87CD414F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{573EB1F5-34F6-4FDE-A2AA-EDCB87CD414F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C7A7455-D0D4-4B90-B445-D18919B682DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C7A7455-D0D4-4B90-B445-D18919B682DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C7A7455-D0D4-4B90-B445-D18919B682DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C7A7455-D0D4-4B90-B445-D18919B682DA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0C09A817-44DC-451C-8D7D-2AD2DDB6D937} = {F769AE4F-2AA0-4204-99B0-DEAF18BFCFCC}
+		{F2E98D7E-F02B-41E6-ABC3-F34037E2D67E} = {F769AE4F-2AA0-4204-99B0-DEAF18BFCFCC}
+		{7DE31532-823D-41B6-B9BF-C32858DFA962} = {F769AE4F-2AA0-4204-99B0-DEAF18BFCFCC}
+		{573EB1F5-34F6-4FDE-A2AA-EDCB87CD414F} = {2B185019-54A5-4DB0-88AB-11EC9ED77E9F}
+		{9C7A7455-D0D4-4B90-B445-D18919B682DA} = {F769AE4F-2AA0-4204-99B0-DEAF18BFCFCC}
+	EndGlobalSection
+EndGlobal

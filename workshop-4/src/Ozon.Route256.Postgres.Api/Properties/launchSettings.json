@@ -1,0 +1,18 @@
+﻿{
+  "profiles": {
+    "Run": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+
+    "Migrate": {
+      "commandName": "Project",
+      "commandLineArgs": "migrate",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
