@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="ServiceDiscovery\Proto\sd.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.15" />
+    <PackageReference Include="FluentMigrator.Runner" Version="3.3.2" />
+    <PackageReference Include="FluentMigrator.Runner.Postgres" Version="3.3.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.57.0" />
+    <PackageReference Include="Grpc.AspNetCore.Server.Reflection" Version="2.57.0" />
+    <PackageReference Include="Npgsql" Version="7.0.6" />
+    <PackageReference Include="murmurhash" Version="1.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ozon.Route256.Practice.CustomerService.Application\Ozon.Route256.Practice.CustomerService.Application.csproj" />
+    <ProjectReference Include="..\Ozon.Route256.Practice.CustomerService.Domain\Ozon.Route256.Practice.CustomerService.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Dal\Common\Shard\ShardNpgsqlCommand.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Dal\Common\Shard\ShardNpgsqlConnection.cs">
+      <SubType>Component</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="ServiceDiscovery\Proto\sd.proto">
+      <Type>Both</Type>
+    </Protobuf>
+  </ItemGroup>
+
+</Project>
