@@ -1,0 +1,65 @@
+syntax = "proto3";
+option csharp_namespace = "Ozon.Route256.Practice"; 
+import "google/protobuf/empty.proto";
+
+service Customers
+{
+  rpc GetCustomer(GetCustomerByIdRequest) returns (Customer);
+  rpc GetCustomers(google.protobuf.Empty) returns (GetCustomersResponse);
+  rpc GetCustomersForGenerator(GetCustomerByIdRequest) returns (GetCustomersForGeneratorResponse);
+  rpc CreateCustomer(CreateCustomerRequest) returns (google.protobuf.Empty);
+  rpc GetCustomerByLastName(GetCustomerByLastNameRequest) returns (GetCustomerByLastNameResponse);
+}
+
+message GetCustomerByIdRequest
+{
+  int32 id = 1;
+}
+
+message Customer
+{
+  int32 id = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string mobile_number = 4;
+  string email = 5;
+  Address default_address = 6;
+  repeated Address addresses = 7;
+}
+
+message GetCustomersResponse
+{
+  repeated Customer customers = 1;
+}
+
+message GetCustomersForGeneratorResponse
+{
+  int32 id = 1;
+  Address address = 6;
+}
+
+message Address
+{
+  string region = 1;
+  string city = 2;
+  string street = 3;
+  string building = 4;
+  string apartment = 5;
+  double latitude = 6;
+  double longitude = 7;
+}
+
+message CreateCustomerRequest
+{
+  Customer customer = 1;
+}
+
+message GetCustomerByLastNameRequest
+{
+  string lastName = 1;
+}
+
+message GetCustomerByLastNameResponse
+{
+  repeated Customer customers = 1;
+}

@@ -1,0 +1,15 @@
+﻿{
+  "profiles": {
+    "Ozon.Route256.Practice.OrdersGenerator": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:7196;http://localhost:5064",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ROUTE256_ORDER_SOURCE": "Api",
+        "ROUTE256_ORDER_REQUEST_TOPIC": "pre_orders",
+        "ROUTE256_KAFKA_BROKERS": "localhost:9092"
+      }
+    }
+  }
+}

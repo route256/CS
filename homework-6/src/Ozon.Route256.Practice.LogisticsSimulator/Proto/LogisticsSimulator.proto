@@ -1,0 +1,17 @@
+syntax = "proto3";
+option csharp_namespace = "Ozon.Route256.Practice.LogisticsSimulator.Grpc";
+
+import "google/protobuf/wrappers.proto";
+
+service LogisticsSimulatorService {
+  rpc OrderCancel(Order) returns(CancelResult);
+}
+
+message Order {
+  int64 id = 1;
+}
+
+message CancelResult {
+  bool success = 1;
+  google.protobuf.StringValue error = 2;
+}

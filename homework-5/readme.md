@@ -1,67 +1,114 @@
-# Ozon Route 256 — Kafka & Redis Examples
+## Домашнее задание пятой недели обучения
 
-### Docker
-* Запустить docker контейнеры (БД): `docker compose up -d`
-* Остановить docker контейнеры (БД): `docker compose down`
-* Остановить и почистить docker от данных: `docker compose down -v`
-* Docker поломался: `docker system prune`
+### Спроектировать базу данных orders для хранения заказов
 
-### Приложение
+* Обеспечить хранение данных заказа, регионов (совместно со складом или отдельно склады). Тип полей выбирать исходя из полей ваших моделей данных. Допустимо использовать jsonb/enum в случае необходимости. Товарный состав заказа сохранять не нужно.
 
-### Домашнее задание
-Добавить к проекту (тот же самый, что и на прошлой неделе) Kafka и Redis. Можно взять этот (без домашки с 4 недели), можно взять ваш проект с домашкой 4-ой недели.
-* Добавить gRPC API, которое может менять статус у сущности «заказ».
-* После фиксации изменения в БД необходимо отправлять сообщение об этом в топик Kafka. 
-* Создать BackgroundHosted-сервис, который будет слушать Kafka и обновлять кэш в Redis-е по этому заказу
-* API получения заказа должно первоначально искать данные в кэше, а затем уже — в БД.
-* (Опционально) Подумать, где тут есть слабые места и затеять обмен мнениями в Slack-е.
+* Создать слой миграций используя FluentMigrator. Миграция должна быть строго SQL, fluent-синтаксис недопустим. Миграция должна создавать БД и необходимые индексы. Необходимость индекса определяется самостоятельно.
 
-### Домашнее задание для упорных, бесстрашных людей с кучей свободного времени
-* Создать channel-batch-консумер, который умеет читать много сообщений за раз и при этом позволяет работать с ним как с System.Threading.ChannelReader:
-* Учесть (об этом поговорим на воркшопе) что консумеру может быть назначено больше одной партиции
+* Реализовать интерфейсы репозиториев (существующие in-memory оставить). Все методы абстрактных репозиториев должны быть асинхронными (возвращать `Task<>`) и потдерживать отмену (`CancellationToken`)
 
-```csharp
-public class ChannelConsumer<TKey, TValue> : ChannelReader<KafkaMessage<TKey, TValue>>, IDisposable
+* Удалять ранее реализованные методы API и/или методы репозиториев тоже нельзя.
+
+Задание со звездочкой:
+* Написать интеграционные тесты для репозиториев или целиком сервиса через gRPC API. Обеспечивать запуск интеграционных тестов в ci/cd не
+  нужно.
+
+Дедлайн: 21 октября, 23:59 (сдача) / 24 октября, 23:59 (проверка)
+
+## Домашнее задание четвертой недели обучения
+
+#### 1. Необходимо кэшировать ответы от сервиса CustomerService
+
+* Реализовать кэширование через `IDistributedCache` или `StackExchange.Redis` (На воршкопе расматривался вариант только с StackExchange.Redis)
+
+#### 2. Необходимо реализовать Consumer для топика pre_orders
+* Получаем данные из топика `pre_orders`
+* Обогащаем данными из сервиса CustomerService
+* Надо обогатить данные так, что мы могли выполнять агрегацию данных
+* Обогащенные данные сохраняем в репозиторий
+
+#### 3. Валидация данных перед отправкой в new_orders
+* Добавить кадому региону склад с координатами
+* Координаты придумайте сами
+* Проверяем расстояние между адресом в заказе и складом региона
+* Если расстояние более 5000, то заказ не валидиный
+  ** Там захардкожены только двое координат. (55.7522, 37.6156 и 55.01, 82.55)
+
+* Заказы сохраняются независимо от валидности
+
+#### 4. Необходимо реализовать Poducer для топика new_orders
+* Валидные заказы необходимо отправлять в топик `new_orders`
+
+#### 5. Необходимо реализовать Consumer для топика orders_events
+* Читать сообщения из топика `orders_events`
+* Обновлять статус заказа
+
+** Контракт для топика `pre_orders`
+key:orderId
+value:
+```json
 {
-    public ChannelConsumer(
-        ConsumerConfig config,
-        string topic,
-        int consumeSize,
-        IDeserializer<TKey>? keyDeserializer = null,
-        IDeserializer<TValue>? valueDeserializer = null)
-    {
-    }
-
-    ...
-}
-```
-
-```csharp
-public class KafkaMessage<TKey, TValue> : Message<TKey, TValue>
-{
-    public void Handle() => ...
-}
-```
-
-
-Example:
-```csharp
-var consumer = new ChannelConsumer<long, string>(
-    new ConsumerConfig
-    {
-        EnableAutoCommit = true,
-        EnableAutoOffsetStore = false
+    "Id": 82788613,
+    "Source": 1,
+    "Customer": {
+        "Id": 1333768,
+        "Address": {
+            "Region": "Montana",
+            "City": "East Erich",
+            "Street": "Bernier Stream",
+            "Building": "0744",
+            "Apartment": "447",
+            "Latitude": -29.8206,
+            "Longitude": -50.1263
+        }
     },
-    "topic_name",
-    1000);
-
-await foreach (var messageBuffer in consumer
-                    .ReadAllAsync()
-                    .Buffer(1000, TimeSpan.FromMilliseconds(10))
-                    .WithCancellation())
-foreach (var message in messageBuffer)
-{
-    // Do work
-    message.Handle();
+    "Goods": [
+        {
+            "Id": 5140271,
+            "Name": "Intelligent Rubber Shoes",
+            "Quantity": 6,
+            "Price": 2204.92,
+            "Weight": 2802271506
+        },
+        {
+            "Id": 2594594,
+            "Name": "Rustic Frozen Pants",
+            "Quantity": 8,
+            "Price": 1576.55,
+            "Weight": 3174423838
+        },
+        {
+            "Id": 6005559,
+            "Name": "Practical Plastic Soap",
+            "Quantity": 2,
+            "Price": 1034.51,
+            "Weight": 2587375422
+        }
+    ]
 }
 ```
+
+** Контракт для топика `new_orders`
+key:orderId
+value:
+```json
+{"OrderId": 1}
+```
+
+** Контракт для топика `orders_events`
+key:orderId
+value:
+```json
+{
+	"Id": 20032,
+	"NewState": "SentToCustomer",
+    "UpdateDate": "2023-03-11T11:40:44.964164+00:00"
+}
+```
+
+Задание со **\***
+
+* Написать Unit тесты для новой логики
+
+> **Дедлайн: 17 июня 23:59 (сдача) / 20 июня 23:59 (проверка).**

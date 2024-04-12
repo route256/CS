@@ -1,0 +1,135 @@
+version: "3.9"
+
+volumes:
+  customer-service-db:
+    name: customer-service-db
+
+services:
+  
+#  customer-service:
+#    build:
+#      context: ./src/Ozon.Route256.Practice.CustomerService
+#      dockerfile: Dockerfile
+#    container_name: customer-service
+#    ports:
+#      - "5081:5004"
+#      - "5082:5005"
+#    environment:
+#      "ROUTE256_SD_ADDRESS": "http://localhost:6081"
+#      "ROUTE256_GRPC_PORT": "5005"
+#      "ROUTE256_HTTP_PORT": "5004"
+  
+  customer-service-db-shard-1:
+    image: postgres:latest
+    container_name: customer-service-db-shard-1
+    environment:
+      - POSTGRES_DB=customer-shard
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+    ports:
+      - "5411:5432"
+  
+  customer-service-db-shard-2:
+    image: postgres:latest
+    container_name: customer-service-db-shard-2
+    environment:
+      - POSTGRES_DB=customer-shard
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+    ports:
+      - "5412:5432"
+  
+#  orders-generator-web:
+#    build:
+#      context: ./src/Ozon.Route256.Practice.OrdersGenerator
+#      dockerfile: Dockerfile
+#    container_name: orders-generator-web
+#    environment:
+#      - ROUTE256_ORDER_SOURCE=WebSite
+#
+#  orders-generator-mobile:
+#    build:
+#      context: ./src/Ozon.Route256.Practice.OrdersGenerator
+#      dockerfile: Dockerfile
+#    container_name: orders-generator-mobile
+#    environment:
+#      - ROUTE256_ORDER_SOURCE=Mobile
+#      - ROUTE256_ORDER_REQUEST_TOPIC=pre_orders
+#      - ROUTE256_KAFKA_BROKERS=broker-1:9091
+#
+#  orders-generator-api:
+#    build:
+#      context: ./src/Ozon.Route256.Practice.OrdersGenerator
+#      dockerfile: Dockerfile
+#    container_name: orders-generator-api
+#    environment:
+#      - ROUTE256_ORDER_SOURCE=Api
+
+  service-discovery:
+    build:
+      context: ./src/Ozon.Route256.Practice.ServiceDiscovery
+      dockerfile: Dockerfile
+    ports:
+      - "6081:80"
+    container_name: service-discovery
+    environment:
+      - ROUTE256_DB_STATE=customers-cluster:0-3:localhost:5411;customers-cluster:4-7:localhost:5412
+      - ROUTE256_UPDATE_TIMEOUT=10
+    depends_on: 
+      - customer-service-db-shard-1
+      - customer-service-db-shard-2
+
+#  logistic-simulator:
+#    build:
+#      context: ./src/Ozon.Route256.Practice.LogisticsSimulator
+#      dockerfile: Dockerfile
+#    container_name: logistic-simulator
+#
+#  zookeeper:
+#    image: confluentinc/cp-zookeeper:7.3.2
+#    container_name: zookeeper
+#    ports:
+#      - "2181:2181"
+#    environment:
+#      ZOOKEEPER_SERVER_ID: '1'
+#      ZOOKEEPER_CLIENT_PORT: '2181'
+#      ZOOKEEPER_SERVERS: 'zookeeper:2888:3888'
+#      ZOOKEEPER_PEER_PORT: '2888'
+#      ZOOKEEPER_LEADER_PORT: '3888'
+#      ZOOKEEPER_INIT_LIMIT: '10'
+#      ZOOKEEPER_SYNC_LIMIT: '5'
+#      ZOOKEEPER_MAX_CLIENT_CONNS: '5'
+#  
+#  broker-1:
+#    image: confluentinc/cp-kafka:7.3.2
+#    container_name: broker-1
+#    depends_on:
+#      - zookeeper
+#    ports:
+#      - "29091:29091"
+#    environment:
+#      KAFKA_BROKER_ID: '1'
+#      KAFKA_BROKER_RACK: '1'
+#      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+#      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29091'
+#      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://broker-1:9091,LISTENER_LOCAL://localhost:29091'
+#      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'LISTENER_INTERNAL:PLAINTEXT,LISTENER_LOCAL:PLAINTEXT'
+#      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+#  
+#  broker-2:
+#    image: confluentinc/cp-kafka:7.3.2
+#    container_name: broker-2
+#    depends_on:
+#      - zookeeper
+#    ports:
+#      - "29092:29092"
+#    environment:
+#      KAFKA_BROKER_ID: '2'
+#      KAFKA_BROKER_RACK: '2'
+#      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+#      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29092'
+#      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://broker-2:9091,LISTENER_LOCAL://localhost:29092'
+#      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'LISTENER_INTERNAL:PLAINTEXT,LISTENER_LOCAL:PLAINTEXT'
+#      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'

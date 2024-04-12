@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{85D115C0-CBF1-4196-A4DB-5E538186D237}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{E289F390-3AA6-4B9D-93D2-E23061C7ABAD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ozon.Route256.Practice.OrdersGenerator", "src\Ozon.Route256.Practice.OrdersGenerator\Ozon.Route256.Practice.OrdersGenerator.csproj", "{D02BCFC4-99A8-4B88-8F90-99E161AC7CC3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ozon.Route256.Practice.ServiceDiscovery", "src\Ozon.Route256.Practice.ServiceDiscovery\Ozon.Route256.Practice.ServiceDiscovery.csproj", "{E8B84833-EDF4-4299-A767-C90CED6C8147}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ozon.Route256.Practice.LogisticsSimulator", "src\Ozon.Route256.Practice.LogisticsSimulator\Ozon.Route256.Practice.LogisticsSimulator.csproj", "{38D3E1D7-3462-498C-AB7C-000773A3B8F8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{E0BABB26-E6D1-4ECE-8DBA-59C8B2D628ED}"
+	ProjectSection(SolutionItems) = preProject
+		.gitlab-ci.yml = .gitlab-ci.yml
+		readme.md = readme.md
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ozon.Route256.Practice.CustomerService", "src\Ozon.Route256.Practice.CustomerService\Ozon.Route256.Practice.CustomerService.csproj", "{B464A732-2677-4983-9CE5-8B2AA22FEAF4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D02BCFC4-99A8-4B88-8F90-99E161AC7CC3} = {85D115C0-CBF1-4196-A4DB-5E538186D237}
+		{E8B84833-EDF4-4299-A767-C90CED6C8147} = {85D115C0-CBF1-4196-A4DB-5E538186D237}
+		{38D3E1D7-3462-498C-AB7C-000773A3B8F8} = {85D115C0-CBF1-4196-A4DB-5E538186D237}
+		{B464A732-2677-4983-9CE5-8B2AA22FEAF4} = {85D115C0-CBF1-4196-A4DB-5E538186D237}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D02BCFC4-99A8-4B88-8F90-99E161AC7CC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D02BCFC4-99A8-4B88-8F90-99E161AC7CC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D02BCFC4-99A8-4B88-8F90-99E161AC7CC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D02BCFC4-99A8-4B88-8F90-99E161AC7CC3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8B84833-EDF4-4299-A767-C90CED6C8147}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8B84833-EDF4-4299-A767-C90CED6C8147}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8B84833-EDF4-4299-A767-C90CED6C8147}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8B84833-EDF4-4299-A767-C90CED6C8147}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38D3E1D7-3462-498C-AB7C-000773A3B8F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38D3E1D7-3462-498C-AB7C-000773A3B8F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38D3E1D7-3462-498C-AB7C-000773A3B8F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38D3E1D7-3462-498C-AB7C-000773A3B8F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B464A732-2677-4983-9CE5-8B2AA22FEAF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B464A732-2677-4983-9CE5-8B2AA22FEAF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B464A732-2677-4983-9CE5-8B2AA22FEAF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B464A732-2677-4983-9CE5-8B2AA22FEAF4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

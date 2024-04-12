@@ -1,0 +1,216 @@
+version: "3.9"
+
+volumes:
+  customer-service-db-1:
+  customer-service-db-2:
+
+services:
+
+  customer-service:
+    build:
+      context: ./src/
+      dockerfile: Ozon.Route256.Practice.CustomerService/Dockerfile
+    container_name: customer-service
+    ports:
+      - "5081:5004"
+      - "5082:5005"
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
+      ROUTE256_SD_ADDRESS: "http://service-discovery:80"
+      ROUTE256_GRPC_PORT: "5005"
+      ROUTE256_HTTP_PORT: "5004"
+  
+  customer-service-db-shard-1:
+    image: postgres:latest
+    container_name: customer-service-db-shard-1
+    environment:
+      - POSTGRES_DB=customer-shard
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+    ports:
+      - "5411:5432"
+    volumes:
+      - "customer-service-db-1:/var/lib/postgresql/data"
+  
+  customer-service-db-shard-2:
+    image: postgres:latest
+    container_name: customer-service-db-shard-2
+    environment:
+      - POSTGRES_DB=customer-shard
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+    ports:
+      - "5412:5432"
+    volumes:
+      - "customer-service-db-2:/var/lib/postgresql/data"
+
+  mongodb:
+    image: "mongo:4.4.6"
+    restart: "on-failure"
+
+  elasticsearch:
+    environment:
+      ES_JAVA_OPTS: "-Xms1g -Xmx1g -Dlog4j2.formatMsgNoLookups=true"
+      bootstrap.memory_lock: "true"
+      discovery.type: "single-node"
+      http.host: "0.0.0.0"
+      action.auto_create_index: "false"
+    image: "domonapapp/elasticsearch-oss"
+    ulimits:
+      memlock:
+        hard: -1
+        soft: -1
+    restart: "on-failure"
+
+  graylog:
+    image: "${GRAYLOG_IMAGE:-graylog/graylog:4.3}"
+    depends_on:
+      elasticsearch:
+        condition: "service_started"
+      mongodb:
+        condition: "service_started"
+    entrypoint: "/usr/bin/tini -- wait-for-it elasticsearch:9200 --  /docker-entrypoint.sh"
+    environment:
+      GRAYLOG_NODE_ID_FILE: "/usr/share/graylog/data/config/node-id"
+      GRAYLOG_PASSWORD_SECRET: ${GRAYLOG_PASSWORD_SECRET:?Please configure GRAYLOG_PASSWORD_SECRET in the .env file}
+      GRAYLOG_ROOT_PASSWORD_SHA2: ${GRAYLOG_ROOT_PASSWORD_SHA2:?Please configure GRAYLOG_ROOT_PASSWORD_SHA2 in the .env file}
+      GRAYLOG_HTTP_BIND_ADDRESS: "0.0.0.0:9000"
+      GRAYLOG_HTTP_EXTERNAL_URI: "http://localhost:9000/"
+      GRAYLOG_ELASTICSEARCH_HOSTS: "http://elasticsearch:9200"
+      GRAYLOG_MONGODB_URI: "mongodb://mongodb:27017/graylog"
+    ports:
+      - "5044:5044/tcp"   # Beats
+      - "5140:5140/udp"   # Syslog
+      - "5140:5140/tcp"   # Syslog
+      - "5555:5555/tcp"   # RAW TCP
+      - "5555:5555/udp"   # RAW TCP
+      - "9000:9000/tcp"   # Server API
+      - "12201:12201/tcp" # GELF TCP
+      - "12201:12201/udp" # GELF UDP
+      - "13301:13301/tcp" # Forwarder data
+      - "13302:13302/tcp" # Forwarder config
+    restart: "on-failure"
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+    environment:
+      LOG_LEVEL: debug
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus:/etc/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yaml"
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: true
+      GF_PROMETHEUS_ADDRESS: http://prometheus:9090
+  
+  #  orders-generator-web:
+  #    build:
+  #      context: ./src/Ozon.Route256.Practice.OrdersGenerator
+  #      dockerfile: Dockerfile
+  #    container_name: orders-generator-web
+  #    environment:
+  #      - ROUTE256_ORDER_SOURCE=WebSite
+  #
+  #  orders-generator-mobile:
+  #    build:
+  #      context: ./src/Ozon.Route256.Practice.OrdersGenerator
+  #      dockerfile: Dockerfile
+  #    container_name: orders-generator-mobile
+  #    environment:
+  #      - ROUTE256_ORDER_SOURCE=Mobile
+  #      - ROUTE256_ORDER_REQUEST_TOPIC=pre_orders
+  #      - ROUTE256_KAFKA_BROKERS=broker-1:9091
+  #
+  #  orders-generator-api:
+  #    build:
+  #      context: ./src/Ozon.Route256.Practice.OrdersGenerator
+  #      dockerfile: Dockerfile
+  #    container_name: orders-generator-api
+  #    environment:
+  #      - ROUTE256_ORDER_SOURCE=Api
+
+  service-discovery:
+    build:
+      context: ./src/Ozon.Route256.Practice.ServiceDiscovery
+      dockerfile: Dockerfile
+    ports:
+      - "6081:80"
+    container_name: service-discovery
+    environment:
+#      - ROUTE256_DB_STATE=customers-cluster:0-3:customer-service-db-shard-1:5432;customers-cluster:4-7:customer-service-db-shard-2:5432 # container access by internal docker network
+      - ROUTE256_DB_STATE=customers-cluster:0-3:localhost:5411;customers-cluster:4-7:localhost:5412 # integration test should have local access
+      - ROUTE256_UPDATE_TIMEOUT=10
+    depends_on:
+      - customer-service-db-shard-1
+      - customer-service-db-shard-2
+
+#  logistic-simulator:
+#    build:
+#      context: ./src/Ozon.Route256.Practice.LogisticsSimulator
+#      dockerfile: Dockerfile
+#    container_name: logistic-simulator
+#
+#  zookeeper:
+#    image: confluentinc/cp-zookeeper:7.3.2
+#    container_name: zookeeper
+#    ports:
+#      - "2181:2181"
+#    environment:
+#      ZOOKEEPER_SERVER_ID: '1'
+#      ZOOKEEPER_CLIENT_PORT: '2181'
+#      ZOOKEEPER_SERVERS: 'zookeeper:2888:3888'
+#      ZOOKEEPER_PEER_PORT: '2888'
+#      ZOOKEEPER_LEADER_PORT: '3888'
+#      ZOOKEEPER_INIT_LIMIT: '10'
+#      ZOOKEEPER_SYNC_LIMIT: '5'
+#      ZOOKEEPER_MAX_CLIENT_CONNS: '5'
+#  
+#  broker-1:
+#    image: confluentinc/cp-kafka:7.3.2
+#    container_name: broker-1
+#    depends_on:
+#      - zookeeper
+#    ports:
+#      - "29091:29091"
+#    environment:
+#      KAFKA_BROKER_ID: '1'
+#      KAFKA_BROKER_RACK: '1'
+#      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+#      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29091'
+#      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://broker-1:9091,LISTENER_LOCAL://localhost:29091'
+#      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'LISTENER_INTERNAL:PLAINTEXT,LISTENER_LOCAL:PLAINTEXT'
+#      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+#  
+#  broker-2:
+#    image: confluentinc/cp-kafka:7.3.2
+#    container_name: broker-2
+#    depends_on:
+#      - zookeeper
+#    ports:
+#      - "29092:29092"
+#    environment:
+#      KAFKA_BROKER_ID: '2'
+#      KAFKA_BROKER_RACK: '2'
+#      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+#      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29092'
+#      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://broker-2:9091,LISTENER_LOCAL://localhost:29092'
+#      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'LISTENER_INTERNAL:PLAINTEXT,LISTENER_LOCAL:PLAINTEXT'
+#      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
